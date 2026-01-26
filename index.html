@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credenciales Digitales - Consejos Médicos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #5d6fb89d;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .header {
+            text-align: center;
+            padding: 30px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.2em;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .selector-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .selector-section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .select-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        select {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            color: #333;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .selected-info {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .selected-info.show {
+            display: block;
+        }
+
+        .selected-info h3 {
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .especialidades-container {
+            display: none;
+        }
+
+        .especialidades-container.show {
+            display: block;
+        }
+
+        .especialidades-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .especialidad-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .especialidad-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+        }
+
+        .card-image {
+            height: 150px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: black;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .card-title {
+            color: #667eea;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .card-specialty {
+            color: #333;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .card-button {
+            width: 100%;
+            background: #155eef;
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .card-button:active {
+            transform: translateY(0);
+        }
+
+        .no-selection {
+            text-align: center;
+            padding: 60px 20px;
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: white;
+            font-size: 1.2em;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .especialidades-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .selector-section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1> Credenciales Digitales</h1>
+        <p>Consejos Médicos de Especialidades</p>
+    </div>
+
+    <div class="container">
+        <div class="selector-section">
+            <h2>Selecciona un Consejo Médico</h2>
+            <div class="select-container">
+                <select id="consejoSelect">
+                    <option value="">-- Seleccione un Consejo --</option>
+                </select>
+            </div>
+            
+            <div id="selectedInfo" class="selected-info">
+                <h3 id="selectedName"></h3>
+                <p id="especialidadesCount"></p>
+            </div>
+        </div>
+
+        <div id="especialidadesContainer" class="especialidades-container">
+            <div id="especialidadesGrid" class="especialidades-grid">
+                <!-- Las tarjetas de especialidades se cargarán aquí dinámicamente -->
+            </div>
+        </div>
+
+        <div id="noSelection" class="no-selection">
+            <h2>👆 Selecciona un Consejo Médico</h2>
+            <p>Para ver las especialidades disponibles y sus credenciales digitales</p>
+        </div>
+    </div>
+
+    <script>
+        // Datos de consejos y especialidades (se cargarían desde los archivos JSON)
+        const consejos = [
+            {"id": 1, "name": "Consejo Mexicano de Angiología, Cirugía Vascular y Endovascular, A.C."},
+            {"id": 5, "name": "Consejo Mexicano de Cardiología, A.C."},
+            {"id": 20, "name": "Consejo Mexicano de Certificación en Infectología, A.C."},
+            {"id": 25, "name": "Consejo Mexicano de Certificación en Medicina Familiar, A.C."},
+            {"id": 41, "name": "Consejo Mexicano de Certificación en Pediatría, A.C."},
+            {"id": 44, "name": "Consejo Mexicano de Certificación en Radioterapia, A.C."},
+            {"id": 6, "name": "Consejo Mexicano de Cirugía General, A.C."},
+            {"id": 8, "name": "Consejo Mexicano de Cirugía Neurológica, A.C."},
+            {"id": 7, "name": "Consejo Mexicano de Cirugía Oral y Maxilofacial, A.C."},
+            {"id": 9, "name": "Consejo Mexicano de Cirugía Pediátrica, A.C."},
+            {"id": 10, "name": "Consejo Mexicano de Cirugía Plástica, Estética y Reconstructiva, A.C."},
+            {"id": 4, "name": "Consejo Mexicano de Comunicación, Audiología, Otoneurología y Foniatría, A.C."},
+            {"id": 12, "name": "Consejo Mexicano de Dermatología, A.C."},
+            {"id": 13, "name": "Consejo Mexicano de Endocrinología, A.C."},
+            {"id": 14, "name": "Consejo Mexicano de Especialistas en Coloproctología, A.C."},
+            {"id": 15, "name": "Consejo Mexicano de Gastroenterología, A.C."},
+            {"id": 16, "name": "Consejo Mexicano de Genética, A.C."},
+            {"id": 17, "name": "Consejo Mexicano de Geriatría, A.C."},
+            {"id": 18, "name": "Consejo Mexicano de Ginecología y Obstetricia, A.C."},
+            {"id": 19, "name": "Consejo Mexicano de Hematología, A.C."},
+            {"id": 22, "name": "Consejo Mexicano de Medicina Aeroespacial, A.C."},
+            {"id": 23, "name": "Consejo Mexicano de Medicina Crítica, A.C."},
+            {"id": 28, "name": "Consejo Mexicano de Medicina de Rehabilitación, A.C."},
+            {"id": 30, "name": "Consejo Mexicano de Medicina de Urgencias, A.C."},
+            {"id": 26, "name": "Consejo Mexicano de Medicina Interna, A.C."},
+            {"id": 27, "name": "Consejo Mexicano de Medicina Legal y Forense, A.C."},
+            {"id": 31, "name": "Consejo Mexicano de Medicina Nuclear e Imagen Molecular, A.C."},
+            {"id": 3, "name": "Consejo Mexicano de Médicos Anatomopatólogos, A.C."},
+            {"id": 32, "name": "Consejo Mexicano de Nefrología, A.C."},
+            {"id": 34, "name": "Consejo Mexicano de Neurofisiología Clínica, A.C."},
+            {"id": 35, "name": "Consejo Mexicano de Neurología, A.C."},
+            {"id": 36, "name": "Consejo Mexicano de Oftalmología, A.C."},
+            {"id": 37, "name": "Consejo Mexicano de Oncología, A.C."},
+            {"id": 38, "name": "Consejo Mexicano de Ortopedia y Traumatología, A.C."},
+            {"id": 39, "name": "Consejo Mexicano de Otorrinolaringología y Cirugía de Cabeza y Cuello, A.C."},
+            {"id": 40, "name": "Consejo Mexicano de Patología Clínica y Medicina de Laboratorio, A.C."},
+            {"id": 42, "name": "Consejo Mexicano de Psiquiatría, A.C."},
+            {"id": 43, "name": "Consejo Mexicano de Radiología e Imagen, A.C."},
+            {"id": 45, "name": "Consejo Mexicano de Reumatología, A.C."},
+            {"id": 2, "name": "Consejo Nacional de Certificación en Anestesiología, A.C."},
+            {"id": 11, "name": "Consejo Nacional de Cirugía del Tórax, A.C."},
+            {"id": 21, "name": "Consejo Nacional de Inmunología Clínica y Alergia, A.C."},
+            {"id": 24, "name": "Consejo Nacional de Medicina del Deporte, A.C."},
+            {"id": 33, "name": "Consejo Nacional de Neumología, A.C."},
+            {"id": 46, "name": "Consejo Nacional de Salud Pública, A.C."},
+            {"id": 29, "name": "Consejo Nacional Mexicano de Medicina del Trabajo, A.C."},
+            {"id": 47, "name": "Consejo Nacional Mexicano de Urología, A.C."}
+        ];
+
+        const especialidades = [
+            {"id": 1, "name": "Angiología, Cirugía Vascular y Endovascular", "id_consejo": 1},
+            {"id": 13, "name": "Cardiología Clínica", "id_consejo": 5},
+            {"id": 15, "name": "Cardiología Intervencionista", "id_consejo": 5},
+            {"id": 16, "name": "Cardiología Intervencionista en Cardiopatías Congénitas", "id_consejo": 5},
+            {"id": 14, "name": "Cardiología Pediátrica", "id_consejo": 5},
+            {"id": 17, "name": "Ecocardiografía Adultos", "id_consejo": 5},
+            {"id": 18, "name": "Ecocardiografía Pediátrica", "id_consejo": 5},
+            {"id": 19, "name": "Electrofisiología", "id_consejo": 5},
+            {"id": 20, "name": "Rehabilitación Cardiaca y Prevención Secundaria", "id_consejo": 5},
+            {"id": 56, "name": "Infectología Adultos", "id_consejo": 20},
+            {"id": 57, "name": "Infectologia Pediátrica", "id_consejo": 20},
+            {"id": 64, "name": "Medicina del Niño y del Adulto para los Servicios Rurales de Salud", "id_consejo": 25},
+            {"id": 63, "name": "Medicina Familiar", "id_consejo": 25},
+            {"id": 65, "name": "Medicina Integrada", "id_consejo": 25},
+            {"id": 108, "name": "Neonatología", "id_consejo": 41},
+            {"id": 120, "name": "Radio-Oncología", "id_consejo": 44},
+            {"id": 22, "name": "Cirugía Bariátrica", "id_consejo": 6},
+            {"id": 24, "name": "Cirugía de Trasplantes", "id_consejo": 6},
+            {"id": 21, "name": "Cirugía General", "id_consejo": 6},
+            {"id": 23, "name": "Cirugía para los Servicios Rurales de Salud", "id_consejo": 6},
+            {"id": 133, "name": "Endoscopia Gastrointestinal", "id_consejo": 6},
+            {"id": 26, "name": "Cirugía Neurológica", "id_consejo": 8},
+            {"id": 27, "name": "Neurocirugía Pediátrica", "id_consejo": 8},
+            {"id": 28, "name": "Terapia Endovascular Neurológica", "id_consejo": 8},
+            {"id": 25, "name": "Cirugía Oral y Maxilofacial", "id_consejo": 7},
+            {"id": 29, "name": "Cirugía Pediátrica", "id_consejo": 9},
+            {"id": 30, "name": "Cirugía Plástica, Estética y Reconstructiva", "id_consejo": 10},
+            {"id": 12, "name": "Comunicación, Audiología, Otoneurología y Foniatría", "id_consejo": 4},
+            {"id": 36, "name": "Dermatología", "id_consejo": 12},
+            {"id": 37, "name": "Dermatología Pediátrica", "id_consejo": 12},
+            {"id": 38, "name": "Dermatopatología", "id_consejo": 12},
+            {"id": 39, "name": "Endocrinología", "id_consejo": 13},
+            {"id": 40, "name": "Endocrinología Pediátrica", "id_consejo": 13},
+            {"id": 41, "name": "Coloproctología", "id_consejo": 14},
+            {"id": 45, "name": "Cirugía del Aparato Digestivo", "id_consejo": 15},
+            {"id": 134, "name": "Endoscopia Gastrointestinal", "id_consejo": 15},
+            {"id": 42, "name": "Gastroenterología", "id_consejo": 15},
+            {"id": 43, "name": "Gastroenterología Pediátrica", "id_consejo": 15},
+            {"id": 48, "name": "Citogenética", "id_consejo": 16},
+            {"id": 46, "name": "Genética Médica", "id_consejo": 16},
+            {"id": 47, "name": "Genética Molecular", "id_consejo": 16},
+            {"id": 49, "name": "Geriatría", "id_consejo": 17},
+            {"id": 51, "name": "Biología de la Reproducción Humana", "id_consejo": 18},
+            {"id": 50, "name": "Ginecología y Obstetricia", "id_consejo": 18},
+            {"id": 52, "name": "Medicina Materno Fetal", "id_consejo": 18},
+            {"id": 53, "name": "Urología Ginecológica", "id_consejo": 18},
+            {"id": 54, "name": "Hematología", "id_consejo": 19},
+            {"id": 55, "name": "Hematología Pediátrica", "id_consejo": 19},
+            {"id": 59, "name": "Medicina Aeroespacial", "id_consejo": 22},
+            {"id": 60, "name": "Medicina Crítica", "id_consejo": 23},
+            {"id": 61, "name": "Medicina Crítica en Obstetricia", "id_consejo": 23},
+            {"id": 68, "name": "Medicina de Rehabilitación", "id_consejo": 28},
+            {"id": 69, "name": "Rehabilitación Cardiaca", "id_consejo": 28},
+            {"id": 72, "name": "Medicina de Urgencias", "id_consejo": 30},
+            {"id": 73, "name": "Urgencias Pediátricas", "id_consejo": 30},
+            {"id": 66, "name": "Medicina Interna", "id_consejo": 26},
+            {"id": 67, "name": "Medicina Legal y Forense", "id_consejo": 27},
+            {"id": 74, "name": "Medicina Nuclear", "id_consejo": 31},
+            {"id": 75, "name": "Medicina Nuclear Cardiológica", "id_consejo": 31},
+            {"id": 76, "name": "Medicina Nuclear Oncológica, Molecular y Terapéutica", "id_consejo": 31},
+            {"id": 9, "name": "Anatomía Patológica", "id_consejo": 3},
+            {"id": 10, "name": "Neuropatología", "id_consejo": 3},
+            {"id": 11, "name": "Patología Pediátrica", "id_consejo": 3},
+            {"id": 77, "name": "Nefrología", "id_consejo": 32},
+            {"id": 78, "name": "Nefrología Pediátrica", "id_consejo": 32},
+            {"id": 91, "name": "Medicina del Sueño", "id_consejo": 34},
+            {"id": 90, "name": "Neurofisiología Clínica", "id_consejo": 34},
+            {"id": 94, "name": "Medicina del Sueño", "id_consejo": 35},
+            {"id": 92, "name": "Neurología Adultos", "id_consejo": 35},
+            {"id": 93, "name": "Neurología Pediátrica", "id_consejo": 35},
+            {"id": 95, "name": "Terapia Endovascular Neurológica", "id_consejo": 35},
+            {"id": 96, "name": "Oftalmología", "id_consejo": 36},
+            {"id": 99, "name": "Cirugía Oncológica", "id_consejo": 37},
+            {"id": 100, "name": "Cirugía Oncológica Pediátrica", "id_consejo": 37},
+            {"id": 101, "name": "Ginecología Oncológica", "id_consejo": 37},
+            {"id": 97, "name": "Oncología Médica", "id_consejo": 37},
+            {"id": 98, "name": "Oncología Pediátrica", "id_consejo": 37},
+            {"id": 102, "name": "Ortopedia y Traumatología", "id_consejo": 38},
+            {"id": 105, "name": "Neuro-Otología", "id_consejo": 39},
+            {"id": 104, "name": "Otorrinolaringología Pediátrica", "id_consejo": 39},
+            {"id": 103, "name": "Otorrinolaringología y Cirugia de Cabeza y Cuello", "id_consejo": 39},
+            {"id": 106, "name": "Patología Clínica", "id_consejo": 40},
+            {"id": 112, "name": "Medicina del Sueño", "id_consejo": 42},
+            {"id": 110, "name": "Psiquiatría", "id_consejo": 42},
+            {"id": 111, "name": "Psiquiatría Infantil y de la Adolescencia", "id_consejo": 42},
+            {"id": 116, "name": "Imagen de la mama", "id_consejo": 43},
+            {"id": 118, "name": "Imagen del Sistema Musculoesquelético", "id_consejo": 43},
+            {"id": 117, "name": "Neurorradiología", "id_consejo": 43},
+            {"id": 113, "name": "Radiología e Imagen", "id_consejo": 43},
+            {"id": 114, "name": "Radiología Pediátrica", "id_consejo": 43},
+            {"id": 115, "name": "Radiología Vascular e Intervencionista", "id_consejo": 43},
+            {"id": 119, "name": "Terapia Endovascular Neurológica", "id_consejo": 43},
+            {"id": 121, "name": "Reumatología", "id_consejo": 45},
+            {"id": 122, "name": "Reumatología Pediátrica", "id_consejo": 45},
+            {"id": 6, "name": "Algología", "id_consejo": 2},
+            {"id": 3, "name": "Anestesiología", "id_consejo": 2},
+            {"id": 4, "name": "Anestesiología Pediátrica", "id_consejo": 2},
+            {"id": 5, "name": "Anestesiólogo para los Servicios Rurales de la Salud", "id_consejo": 2},
+            {"id": 7, "name": "Cuidados Paliativos", "id_consejo": 2},
+            {"id": 8, "name": "Neuroanestesiología", "id_consejo": 2},
+            {"id": 31, "name": "Cirugía Cardiaca en Adultos", "id_consejo": 11},
+            {"id": 32, "name": "Cirugía Cardiaca en Pediatría", "id_consejo": 11},
+            {"id": 33, "name": "Cirugía Cardiotorácica", "id_consejo": 11},
+            {"id": 35, "name": "Cirugía de Tórax Pediátrica No Cardiaca", "id_consejo": 11},
+            {"id": 34, "name": "Cirugía Torácica no Cardiaca", "id_consejo": 11},
+            {"id": 58, "name": "Inmunología Clínica y Alergia", "id_consejo": 21},
+            {"id": 62, "name": "Medicina del Deporte", "id_consejo": 24},
+            {"id": 80, "name": "Broncoscopía Intervencionista", "id_consejo": 33},
+            {"id": 81, "name": "Broncoscopía Intervencionista Pediátrica", "id_consejo": 33},
+            {"id": 82, "name": "Endoscopía Torácica", "id_consejo": 33},
+            {"id": 83, "name": "Fisiología Respiratoria", "id_consejo": 33},
+            {"id": 84, "name": "Fisiología Respiratoria Pediátrica", "id_consejo": 33},
+            {"id": 85, "name": "Medicina del Sueño", "id_consejo": 33},
+            {"id": 86, "name": "Neumología", "id_consejo": 33},
+            {"id": 87, "name": "Neumología Pediátrica", "id_consejo": 33},
+            {"id": 88, "name": "Rehabilitación Pulmonar", "id_consejo": 33},
+            {"id": 89, "name": "Rehabilitación Pulmonar Pediátrica", "id_consejo": 33},
+            {"id": 126, "name": "Calidad de la Atención Clínica", "id_consejo": 46},
+            {"id": 124, "name": "Epidemiología", "id_consejo": 46},
+            {"id": 125, "name": "Medicina Preventiva", "id_consejo": 46},
+            {"id": 123, "name": "Salud Pública", "id_consejo": 46},
+            {"id": 70, "name": "Medicina del Trabajo", "id_consejo": 29},
+            {"id": 71, "name": "Medicina del Trabajo y Ambiental", "id_consejo": 29},
+            {"id": 128, "name": "Trasplante Renal", "id_consejo": 47},
+            {"id": 127, "name": "Urología", "id_consejo": 47}
+        ];
+
+        // Elementos del DOM
+        const consejoSelect = document.getElementById('consejoSelect');
+        const selectedInfo = document.getElementById('selectedInfo');
+        const selectedName = document.getElementById('selectedName');
+        const especialidadesCount = document.getElementById('especialidadesCount');
+        const especialidadesContainer = document.getElementById('especialidadesContainer');
+        const especialidadesGrid = document.getElementById('especialidadesGrid');
+        const noSelection = document.getElementById('noSelection');
+
+        // Cargar consejos en el select
+        function loadConsejos() {
+            consejos.forEach(consejo => {
+                const option = document.createElement('option');
+                option.value = consejo.id;
+                option.textContent = consejo.name;
+                consejoSelect.appendChild(option);
+            });
+        }
+
+        // Filtrar especialidades por consejo
+        function getEspecialidadesByConsejo(consejoId) {
+            return especialidades.filter(esp => esp.id_consejo == consejoId);
+        }
+
+        // Crear tarjeta de especialidad
+        function createEspecialidadCard(especialidad) {
+            return `
+                <div class="especialidad-card">
+                    <div class="card-image">
+                        <img src="" alt="Imagen de especialidad" style="display: none;">
+                        📋 Imagen de Credencial
+                    </div>
+                    <div class="card-content">
+                        <div class="card-title">TITULO</div>
+                        <div class="card-specialty">${especialidad.name}</div>
+                        <button class="card-button" onclick="adquirirCredencial(${especialidad.id}, '${especialidad.name}')">
+                            Adquirir credencial digital
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Manejar selección de consejo
+        function handleConsejoSelection() {
+            const selectedConsejoId = consejoSelect.value;
+            
+            if (!selectedConsejoId) {
+                selectedInfo.classList.remove('show');
+                especialidadesContainer.classList.remove('show');
+                noSelection.style.display = 'block';
+                return;
+            }
+
+            // Encontrar consejo seleccionado
+            const selectedConsejo = consejos.find(c => c.id == selectedConsejoId);
+            
+            // Mostrar información del consejo seleccionado
+            selectedName.textContent = selectedConsejo.name;
+            selectedInfo.classList.add('show');
+            
+            // Obtener especialidades del consejo
+            const especialidadesDelConsejo = getEspecialidadesByConsejo(selectedConsejoId);
+            especialidadesCount.textContent = `${especialidadesDelConsejo.length} especialidades disponibles`;
+            
+            // Mostrar especialidades
+            if (especialidadesDelConsejo.length > 0) {
+                especialidadesGrid.innerHTML = especialidadesDelConsejo
+                    .map(esp => createEspecialidadCard(esp))
+                    .join('');
+                
+                especialidadesContainer.classList.add('show');
+                noSelection.style.display = 'none';
+            } else {
+                especialidadesGrid.innerHTML = '<p style="text-align: center; color: #666;">No hay especialidades disponibles para este consejo.</p>';
+                especialidadesContainer.classList.add('show');
+                noSelection.style.display = 'none';
+            }
+        }
+
+        // Función para adquirir credencial
+        function adquirirCredencial(especialidadId, especialidadName) {
+            alert(`🎓 Iniciando proceso de adquisición de credencial digital para:\n\n"${especialidadName}"\n\nID de Especialidad: ${especialidadId}\n\n¡Pronto serás redirigido al proceso de certificación!`);
+        }
+
+        // Event listeners
+        consejoSelect.addEventListener('change', handleConsejoSelection);
+
+        // Inicializar
+        loadConsejos();
+    </script>
+</body>
+</html>
