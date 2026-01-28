@@ -45,21 +45,26 @@
 
         .container {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: flex-start;
-            flex-flow: column nowrap;
+            flex-flow: row nowrap;
             width: 100%;
             height: auto;
-            padding: 4rem 0 2rem 0;
+            padding: 6rem 2rem 2rem 2rem;
+            gap: 30px;
         }
 
         .selector-section {
             background: linear-gradient(135deg, #cbba6a 0%, #a89a4e 100%);
             border-radius: 15px;
             padding: 25px;
-            margin-bottom: 30px;
             box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-            margin-top: 70px;
+            margin-top: 20px;
+            width: 350px;
+            min-width: 350px;
+            height: fit-content;
+            position: sticky;
+            top: 100px;
         }
 
         .selector-section h2 {
@@ -112,6 +117,11 @@
             margin-bottom: 5px;
         }
 
+        .main-content {
+            flex: 1;
+            width: 100%;
+        }
+
         .especialidades-container {
             display: none;
         }
@@ -122,7 +132,7 @@
 
         .especialidades-grid {
             display: grid;
-            grid-template-columns: repeat(3, 350px);
+            grid-template-columns: repeat(auto-fill, 300px);
             gap: 25px;
             margin-top: 20px;
             justify-content: start;
@@ -134,6 +144,8 @@
             overflow: hidden;
             box-shadow: 0 8px 32px rgba(0,0,0,0.1);
             transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
         }
 
         .especialidad-card:hover {
@@ -167,6 +179,9 @@
 
         .card-content {
             padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
 
         .card-title {
@@ -181,6 +196,7 @@
             font-size: 1.1em;
             margin-bottom: 20px;
             line-height: 1.4;
+            flex: 1;
         }
 
         .card-button {
@@ -212,6 +228,7 @@
             background: rgba(255, 255, 255, 0.1);
             border-radius: 15px;
             backdrop-filter: blur(10px);
+            margin-top: 20px;
         }
 
         .logo-font {
@@ -242,13 +259,27 @@
                 font-size: 2em;
             }
             
+            .container {
+                flex-direction: column;
+                padding: 4rem 1rem 2rem 1rem;
+                gap: 20px;
+            }
+            
+            .selector-section {
+                width: 100%;
+                min-width: auto;
+                position: static;
+                margin-top: 20px;
+                padding: 20px;
+            }
+            
             .especialidades-grid {
                 grid-template-columns: 1fr;
                 gap: 20px;
             }
             
-            .selector-section {
-                padding: 20px;
+            .no-selection {
+                margin-top: 20px;
             }
         }
     </style>
@@ -277,15 +308,17 @@
             </div>
         </div>
 
-        <div id="especialidadesContainer" class="especialidades-container">
-            <div id="especialidadesGrid" class="especialidades-grid">
-                <!-- Las tarjetas de especialidades se cargarán aquí dinámicamente -->
+        <div class="main-content">
+            <div id="especialidadesContainer" class="especialidades-container">
+                <div id="especialidadesGrid" class="especialidades-grid">
+                    <!-- Las tarjetas de especialidades se cargarán aquí dinámicamente -->
+                </div>
             </div>
-        </div>
 
-        <div id="noSelection" class="no-selection">
-            <h2>Selecciona un Consejo Médico</h2>
-            <p>Para ver las especialidades disponibles y sus credenciales digitales</p>
+            <div id="noSelection" class="no-selection">
+                <h2>Selecciona un Consejo Médico</h2>
+                <p>Para ver las especialidades disponibles y sus credenciales digitales</p>
+            </div>
         </div>
     </div>
 
@@ -550,7 +583,7 @@
 
         // Función para adquirir credencial
         function adquirirCredencial(especialidadId, especialidadName) {
-            const redirectUrl = "https://lfcareer.prueba.la/buycredential?securityToken=ZXlKcGRpSTZJamxMYmpOdGQwSnJTR0UyWVNzMk0ySnpSMmdyV2tFOVBTSXNJblpoYkhWbElqb2lWMGh4V2lzek5rd3dUemh0WjNRNFZVVlVWbmM0YlV4ek5VNUphbGhwT0VVd1RYcFphQ3N5YVN0VFprZDZXa05wTmk5SFFUTm9kUzlrTTI1SVpITllWSGQxTTNOdlVrSkdXRlZyWVdKaVRYUkJaMjFDYWxGUWIzZEZZMk55VDB0SlNtOVJWVlYzUVdoelZEUTlJaXdpYldGaklqb2lPRE15TmpBMk5tRmxPVEV6WkRZMk56WTVZVEZqTVRoa05EazVNVGMyTXpZM05EazRORE5pT0dOa056RTVNekppT1RoaE1qTmtZakkzWmprNE56TTJNaUlzSW5SaFp5STZJaUo5";
+            const redirectUrl = "life-api.territorium.com/buycredential?securityToken=ZXlKcGRpSTZJamxMYmpOdGQwSnJTR0UyWVNzMk0ySnpSMmdyV2tFOVBTSXNJblpoYkhWbElqb2lWMGh4V2lzek5rd3dUemh0WjNRNFZVVlVWbmM0YlV4ek5VNUphbGhwT0VVd1RYcFphQ3N5YVN0VFprZDZXa05wTmk5SFFUTm9kUzlrTTI1SVpITllWSGQxTTNOdlVrSkdXRlZyWVdKaVRYUkJaMjFDYWxGUWIzZEZZMk55VDB0SlNtOVJWVlYzUVdoelZEUTlJaXdpYldGaklqb2lPRE15TmpBMk5tRmxPVEV6WkRZMk56WTVZVEZqTVRoa05EazVNVGMyTXpZM05EazRORE5pT0dOa056RTVNekppT1RoaE1qTmtZakkzWmprNE56TTJNaUlzSW5SaFp5STZJaUo5";
             
             // Redirigir directamente a la URL
             window.open(redirectUrl, '_self');
